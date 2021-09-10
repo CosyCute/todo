@@ -2,21 +2,16 @@ import React from 'react';
 import TodoListItem from '../TodoListItem/TodoListItem';
 import './TodoList.css';
 
-const TodoList = ({ todos }) => {
-
-  const elements = todos.map((item) => {
-    const { id, ...itemProps } = item;
-
-    return (
-      <li key={id} className="list-group-item">
-        <TodoListItem {...itemProps } />
-      </li>
-    );
-  });
+const TodoList = ({todos, setTodos, remove}) => {
 
   return (
     <ul className="list-group todo-list">
-      { elements }
+      { todos.map((item) => <li className="list-group-item" key={item.id}>
+      <TodoListItem 
+      label={item} 
+      todos={todos} 
+      setTodos={setTodos}
+      remove={remove}/></li>) }
     </ul>
   );
 };
