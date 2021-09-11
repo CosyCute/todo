@@ -17,35 +17,39 @@ const App = () => {
     { label: 'Have a lunch', important: false, done: false, id: 2 }
   ]);
 
+  const [filterBtnArr, setFilterBtnArray] = useState([
+    {label: "All", className: "btn btn-info", id: 0},
+    {label: "Active", className: "btn btn-outline-secondary", id: 1},
+    {label: "Done", className: "btn btn-outline-secondary", id: 2}])
+
   const [appendFilterArray, setAppendFilterArray] = useState([...todos])
 
-  const [filterCondition, setFilterCondition] = useState('All');
+  const reset = (e) => {
+    setTodos(e)
+    setAppendFilterArray(e);
+  }
 
   const removeLabel = (label) =>{
-    setTodos(todos.filter(x => x.id !== label.id))
-    let newArr = todos.filter(x => x.id !== label.id);
+    let newArr = todos.filter(x => x.id !== label.id)
     for(let i = 0; i < todos.length - 1; i++)
       newArr[i].id = i;
+    reset(newArr)
   }
 
   const search = (inputValue) => {
-    setAppendFilterArray([...todos])
-    setTodos([...appendFilterArray].filter(x => x.label.includes(inputValue)))
+    setAppendFilterArray([...todos].filter(x => x.label.toLowerCase().includes(inputValue)))
   }
 
   const filter = (condition) => {
-    setFilterCondition(condition)
     switch (condition){
       case 'All':
-        setTodos([...appendFilterArray])
+        setAppendFilterArray([...todos])
         break;
       case 'Active':
-        if (filterCondition !== 'Done' && filterCondition !== 'Active') setAppendFilterArray([...todos])
-        setTodos([...appendFilterArray].filter(x => x.important))
+        setAppendFilterArray([...todos].filter(x => x.important))
         break;
       case 'Done':
-        if (filterCondition !== 'Active' && filterCondition !== 'Done') setAppendFilterArray([...todos])
-        setTodos([...appendFilterArray].filter(x => !x.important))
+        setAppendFilterArray([...todos].filter(x => !x.important))
         break;
       default :
       break;
@@ -53,17 +57,25 @@ const App = () => {
   }
 
   const addLabel = (labelText) => {
-    setTodos([...todos, {label: labelText, important: false, done: false, id: todos.length + 1}])
-  }
+    if (labelText) {
+    reset([...todos, {label: labelText, important: false, done: false, id: todos.length}])
+  }}
   return (
     <div className="todo-app">
       <AppHeader todos={todos} />
       <div className="top-panel d-flex">
         <SearchPanel searchFilter={search}/>
-        <ItemStatusFilter filter={filter}/>
+        <div className="btn-group">
+          {filterBtnArr.map(x => <ItemStatusFilter 
+          key={x.label}
+          currentFilter={x}
+          filterBtnArr={filterBtnArr}
+          setFilterBtnArray={setFilterBtnArray} 
+          filter={filter}/>)}
+        </div>
       </div>
 
-      <TodoList todos={todos} setTodos={setTodos} remove={removeLabel}/>
+      <TodoList todos={appendFilterArray} setTodos={setTodos} remove={removeLabel}/>
       <ItemAddForm addLabel={addLabel}/>
     </div>
   );
